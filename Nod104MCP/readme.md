@@ -10,6 +10,7 @@ npm install @azure/identity
 npx tsc
 node dist/client.js
 
+```
 mcp-demo/
 ├── package.json
 ├── tsconfig.json
@@ -23,6 +24,7 @@ mcp-demo/
 ├── public/              # (optional) static frontend files
 │   └── index.html       # can call /query via fetch()
 └── README.md
+```
 
 Debug
 When starting a second process (like server + client), give each its own port:
