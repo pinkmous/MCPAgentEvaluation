@@ -10,7 +10,7 @@ app.use(express.static("public")); // 👉 serves index.html automatically
 // Create MCP client by spawning the server process
 const transport = new StdioClientTransport({
   command: "node", // how to start your MCP server
-  args: ["./dist/server.js"], // path to your compiled server
+  args: ["--inspect=9230", "./dist/server.js"], // path to your compiled server
 });
 
 const client = new Client(
@@ -25,12 +25,12 @@ await client.connect(transport); // establish connection with server
   console.log("MCP Client connected to server");
 
   app.post("/query", async (req: Request, res: Response) => {
-    const { prompt } = req.body as { prompt: string };
+    const { question } = req.body as { question: string };
     try {
         const response = await client.callTool({
-            name: "echo-tool",
+            name: "qa-tool",
             arguments: {
-                prompt,
+                question,
             }
     });
       res.json(response);

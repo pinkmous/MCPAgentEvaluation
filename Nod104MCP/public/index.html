@@ -20,11 +20,11 @@
 
   <script>
     async function sendQuery() {
-      const prompt = document.getElementById("promptInput").value;
+      const question = document.getElementById("promptInput").value;
       const res = await fetch("/query", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt })
+        body: JSON.stringify({ question })
       });
 
       const data = await res.json();
