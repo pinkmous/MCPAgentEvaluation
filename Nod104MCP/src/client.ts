@@ -21,7 +21,7 @@ const client = new Client(
 );
 
 async function init() {
-await client.connect(transport); // establish connection with server
+  await client.connect(transport); // establish connection with server
   console.log("MCP Client connected to server");
 
   app.post("/query", async (req: Request, res: Response) => {
@@ -33,6 +33,19 @@ await client.connect(transport); // establish connection with server
                 question,
             }
     });
+      res.json(response);
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.post("/history", async (req, res) => {
+    const { action } = req.body as { action: string };
+    // Compose the full URI using the action variable
+    const uri = `conversation://history/${action}`;
+
+    try {
+      const response = await client.readResource({ uri});
       res.json(response);
     } catch (err: any) {
       res.status(500).json({ error: err.message });

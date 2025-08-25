@@ -6,7 +6,7 @@
   <style>
     body { font-family: Arial, sans-serif; margin: 2rem; }
     input, button { padding: 0.5rem; margin-top: 0.5rem; }
-    #result { margin-top: 1rem; padding: 1rem; border: 1px solid #ccc; }
+    #result, #history { margin-top: 1rem; padding: 1rem; border: 1px solid #ccc; white-space: pre-wrap; }
   </style>
 </head>
 <body>
@@ -15,8 +15,12 @@
 
   <input id="promptInput" type="text" placeholder="Ask something..." size="50" />
   <button onclick="sendQuery()">Send</button>
-
   <div id="result"></div>
+
+  <h2>Conversation History</h2>
+  <button onclick="getHistory()">Refresh History</button>
+  <button onclick="clearHistory()">Clear History</button>
+  <div id="history"></div>
 
   <script>
     async function sendQuery() {
@@ -28,8 +32,33 @@
       });
 
       const data = await res.json();
-      document.getElementById("result").innerText = 
+      document.getElementById("result").innerText =
         data.result?.content?.[0]?.text || JSON.stringify(data, null, 2);
+
+      // auto-refresh history after sending query
+      getHistory();
+    }
+
+    async function getHistory() {
+      const res = await fetch("/history", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "Read" })
+      });
+      const data = await res.json();
+      document.getElementById("history").innerText =
+        data.contents?.[0]?.text || "(no history)";
+    }
+
+    async function clearHistory() {
+      const res = await fetch("/history", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "Delete" })
+      });
+      const data = await res.json();
+      document.getElementById("history").innerText =
+        data.contents?.[0]?.text || "(cleared)";
     }
   </script>
 </body>
