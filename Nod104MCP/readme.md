@@ -21,7 +21,7 @@ mcp-demo/
 ├── README.md
 ├── src/
 │   ├── server.ts             # MCP Server (tool + resource provider)
-│   ├── client.ts             # MCP Client + Express API
+│   ├── mcphost.ts             # MCP Client + Express API
 │   ├── tools/                # MCP tools
 │   │   ├── echoTool.ts
 │   │   └── qaTool.ts
@@ -30,7 +30,7 @@ mcp-demo/
 │   └── types/                # (optional) custom TS types
 ├── dist/                     # compiled JS output from tsc
 │   ├── server.js
-│   └── client.js
+│   └── mcphost.js
 └── public/                   # frontend static files
     └── index.html            # calls /query via fetch()
 ```
@@ -38,8 +38,8 @@ mcp-demo/
 Debug
 When starting a second process (like server + client), give each its own port:
 
-# Client
-node --inspect dist/client.js
+# MCPHost
+node --inspect dist/mcphost.js
 
 # Server
 node --inspect=9230 dist/server.js (automatically spawn with client)
