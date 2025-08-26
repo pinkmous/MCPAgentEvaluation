@@ -12,7 +12,10 @@ const server = new McpServer({
 
 // Register tools
 server.registerTool(echoTool.name, echoTool.config, echoTool.handler);
-server.registerTool(qaTool.name, qaTool.config, qaTool.handler);
+
+// Create qaTool using the server instance
+const qa = qaTool(server);
+server.registerTool(qa.name, qa.config, qa.handler);
 
 // Register resources
 server.registerResource(

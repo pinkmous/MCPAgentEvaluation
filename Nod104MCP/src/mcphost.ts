@@ -2,6 +2,8 @@
 import express, { Request, Response } from "express";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
+import { askAzureLLM } from "./llm/azurellm.js";
+import { CreateMessageRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 
 const app = express();
 app.use(express.json());
@@ -13,14 +15,43 @@ const transport = new StdioClientTransport({
   args: ["--inspect=9230", "./dist/server.js"], // path to your compiled server
 });
 
+// Initialize client with sampling capability
 const client = new Client(
   {
     name: "example-client",
-    version: "1.0.0"
+    version: "1.0.0",
+  },
+  {
+    capabilities: {
+      sampling: {}, // Enable sampling support
+    },
   }
 );
 
 async function init() {
+  // Sampling handler → wires Azure LLM to server’s requests
+  // Register a handler for sampling requests
+  client.setRequestHandler(CreateMessageRequestSchema, async (req) => {
+    // req.params.messages is the array sent by the MCP server tool
+    const userMsg = req.params.messages?.find((m: any) => m.role === "user");
+    const userMessage =
+      userMsg && userMsg.content && userMsg.content.type === "text"
+        ? (userMsg.content.text as string)
+        : undefined;
+    const model = req.params.model || process.env.AZURE_OPENAI_MODEL;
+    // const maxTokens = req.params.maxTokens || 500;
+    const answer = userMessage ? await askAzureLLM(userMessage, model as string) : "No input provided";
+
+    return {
+      role: "assistant",
+      content: {
+        type: "text",
+        text: answer, // must be string
+      },  
+      model: req.params.model
+    };
+});
+
   await client.connect(transport); // establish connection with server
   console.log("MCP Client connected to server");
 
